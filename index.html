@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vault — Multi-Chain Wallet Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0a0a0f;
+      color: #e4e4e7;
+      overflow-x: hidden;
+    }
+    
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    
+    .glass {
+      background: rgba(20, 20, 28, 0.6);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    .glass-light {
+      background: rgba(30, 30, 40, 0.4);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    
+    .gradient-text {
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .glow-accent {
+      box-shadow: 0 0 30px rgba(251, 191, 36, 0.15);
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.6s ease-out forwards;
+      opacity: 0;
+    }
+    
+    .slide-up {
+      animation: slideUp 0.7s ease-out forwards;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+    
+    @keyframes slideUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .stagger-1 { animation-delay: 0.1s; }
+    .stagger-2 { animation-delay: 0.2s; }
+    .stagger-3 { animation-delay: 0.3s; }
+    .stagger-4 { animation-delay: 0.4s; }
+    .stagger-5 { animation-delay: 0.5s; }
+    .stagger-6 { animation-delay: 0.6s; }
+    
+    .pill-active {
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+      color: #0a0a0f;
+      font-weight: 600;
+    }
+    
+    .pill-inactive {
+      background: rgba(30, 30, 40, 0.5);
+      color: #a1a1aa;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    
+    .pill-inactive:hover {
+      background: rgba(40, 40, 50, 0.6);
+      border-color: rgba(251, 191, 36, 0.2);
+      color: #e4e4e7;
+    }
+    
+    .token-row:hover {
+      background: rgba(251, 191, 36, 0.03);
+    }
+    
+    .tx-row:hover {
+      background: rgba(30, 30, 40, 0.4);
+    }
+    
+    canvas {
+      max-width: 100%;
+      height: auto;
+    }
+    
+    .count-up {
+      display: inline-block;
+    }
+    
+    .positive { color: #34d399; }
+    .negative { color: #f87171; }
+    
+    .badge-send {
+      background: rgba(248, 113, 113, 0.15);
+      color: #fca5a5;
+      border: 1px solid rgba(248, 113, 113, 0.2);
+    }
+    
+    .badge-receive {
+      background: rgba(52, 211, 153, 0.15);
+      color: #6ee7b7;
+      border: 1px solid rgba(52, 211, 153, 0.2);
+    }
+    
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+    }
+  </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+  
+  <!-- Header -->
+  <header class="max-w-7xl mx-auto mb-12 fade-in">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl md:text-4xl font-bold tracking-tight mb-1">Vault</h1>
+        <p class="text-sm text-zinc-500 mono">Multi-Chain Portfolio Tracker</p>
+      </div>
+      <div class="glass px-4 py-2 rounded-xl">
+        <p class="text-xs text-zinc-500 mb-0.5">Wallet</p>
+        <p class="mono text-sm font-medium">0x7f3d...a21c</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="max-w-7xl mx-auto space-y-6">
+    
+    <!-- Portfolio Summary -->
+    <div class="glass rounded-3xl p-8 md:p-10 glow-accent slide-up stagger-1">
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="md:col-span-2">
+          <p class="text-sm text-zinc-500 mb-2 tracking-wide uppercase">Total Portfolio Value</p>
+          <h2 class="text-5xl md:text-6xl font-bold mb-4 gradient-text count-up" data-target="124750.85">$0.00</h2>
+          <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2">
+              <span class="text-2xl font-semibold positive">+$8,432.12</span>
+              <span class="px-3 py-1 rounded-full text-sm font-medium positive bg-emerald-500/10 border border-emerald-500/20">+7.24%</span>
+            </div>
+            <span class="text-sm text-zinc-500 mono">24h Change</span>
+          </div>
+        </div>
+        <div class="flex items-center justify-center">
+          <canvas id="allocationChart" width="200" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chain Filters -->
+    <div class="flex gap-3 overflow-x-auto pb-2 slide-up stagger-2">
+      <button class="pill-active px-6 py-3 rounded-full text-sm transition-all duration-300 whitespace-nowrap" data-chain="all">
+        All Chains
+      </button>
+      <button class="pill-inactive px-6 py-3 rounded-full text-sm transition-all duration-300 whitespace-nowrap" data-chain="ethereum">
+        <span class="inline-block w-2 h-2 rounded-full bg-blue-400 mr-2"></span>
+        Ethereum
+      </button>
+      <button class="pill-inactive px-6 py-3 rounded-full text-sm transition-all duration-300 whitespace-nowrap" data-chain="solana">
+        <span class="inline-block w-2 h-2 rounded-full bg-purple-400 mr-2"></span>
+        Solana
+      </button>
+      <button class="pill-inactive px-6 py-3 rounded-full text-sm transition-all duration-300 whitespace-nowrap" data-chain="bsc">
+        <span class="inline-block w-2 h-2 rounded-full bg-yellow-400 mr-2"></span>
+        BSC
+      </button>
+    </div>
+
+    <!-- Token Holdings -->
+    <div class="glass-light rounded-3xl overflow-hidden slide-up stagger-3">
+      <div class="p-6 border-b border-white/5">
+        <h3 class="text-xl font-bold">Token Holdings</h3>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="border-b border-white/5">
+              <th class="text-left px-6 py-4 text-xs font-medium text-zinc-500 uppercase tracking-wider">Asset</th>
+              <th class="text-right px-6 py-4 text-xs font-medium text-zinc-500 uppercase tracking-wider">Balance</th>
+              <th class="text-right px-6 py-4 text-xs font-medium text-zinc-500 uppercase tracking-wider">Price</th>
+              <th class="text-right px-6 py-4 text-xs font-medium text-zinc-500 uppercase tracking-wider">24h Change</th>
+              <th class="text-right px-6 py-4 text-xs font-medium text-zinc-500 uppercase tracking-wider">Value</th>
+            </tr>
+          </thead>
+          <tbody id="tokenTableBody" class="divide-y divide-white/5">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Transaction History -->
+    <div class="glass-light rounded-3xl overflow-hidden slide-up stagger-4">
+      <div class="p-6 border-b border-white/5">
+        <h3 class="text-xl font-bold">Recent Transactions</h3>
+      </div>
+      <div class="divide-y divide-white/5" id="transactionList">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
